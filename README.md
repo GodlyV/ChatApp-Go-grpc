@@ -1,1 +1,1 @@
-# ChatApp-Go-grpc
+# grpc-demo
