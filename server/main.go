@@ -1,8 +1,10 @@
 package main
 
-import(
+import (
+	"context"
 	"log"
 	"net"
+
 	pb "github.com/GodlyV/ChatApp-Go-grpc/proto"
 	"google.golang.org/grpc"
 )
@@ -10,8 +12,13 @@ import(
 const(
 	port = ":8080"
 )
-type helloServer struct{
-	pb.GreetServiceServer
+type myChatService struct{
+	pb.UnimplementedChatServiceServer
+}
+func (s myChatService) ChatInitiate(context.Context, *pb.InitiateRequest) (*pb.InitiateResponse, error){
+	return &pb.InitiateResponse{
+		Id: 1,
+	},nil
 }
 func main(){
 	lis,err:= net.Listen("tcp",port)
@@ -19,8 +26,9 @@ func main(){
 		log.Fatalf("Failed to start the server %v",err)
 	}
 	grpcServer := grpc.NewServer()
+	service := &myChatService{}
 	log.Printf("server started at %v", lis.Addr())
-	pb.RegisterGreetServiceServer(grpcServer, &helloServer{})
+	pb.RegisterChatServiceServer(grpcServer, service)
 	if err := grpcServer.Serve(lis); err !=nil{
 		log.Fatalf("Failed to start: %v",err)
 	}
